@@ -12,6 +12,7 @@ contract SimpleBank {
     }
 
     function withdraw() public {
+        //Reentrancy attack can be done here
         require(userBalance[msg.sender] >= 1 ether, "User has not enough balance");
         require(address(this).balance > 0, "Ban is rekt");
 
