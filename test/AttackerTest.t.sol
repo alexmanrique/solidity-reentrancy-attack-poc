@@ -7,7 +7,6 @@ import {SimpleBank} from "../src/SimpleBank.sol";
 import {Attacker} from "../src/Attacker.sol";
 
 contract AttackerTest is Test {
-    
     uint256 etherToDealBank = 50 ether;
     uint256 etherToDealAttacker = 10 ether;
 
@@ -15,7 +14,6 @@ contract AttackerTest is Test {
     Attacker attacker;
 
     function setUp() public {
-        
         bank = new SimpleBank();
         vm.deal(address(bank), etherToDealBank);
         assert(address(bank).balance == etherToDealBank);
