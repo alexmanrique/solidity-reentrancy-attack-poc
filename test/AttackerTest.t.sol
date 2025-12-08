@@ -7,10 +7,7 @@ import {SimpleBank} from "../src/SimpleBank.sol";
 import {Attacker} from "../src/Attacker.sol";
 
 contract AttackerTest is Test {
-    address owner = vm.addr(1);
-    address maliciousUser = vm.addr(2);
-    address randomUser = vm.addr(3);
-
+    
     uint256 etherToDealBank = 50 ether;
     uint256 etherToDealAttacker = 10 ether;
 
@@ -18,10 +15,8 @@ contract AttackerTest is Test {
     Attacker attacker;
 
     function setUp() public {
-        vm.startPrank(owner);
+        
         bank = new SimpleBank();
-        vm.stopPrank();
-
         vm.deal(address(bank), etherToDealBank);
         assert(address(bank).balance == etherToDealBank);
 
